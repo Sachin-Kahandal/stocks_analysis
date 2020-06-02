@@ -4,10 +4,16 @@ import time
 
 
 # Benjamin Graham's way of evaluating stocks
+# Advantage of this formula, it solely depends on eps and book value, which investor can easily come up with.
+# Rather than tedious calculations for calculating/assuming growth rate of a company
+# Graham_no concentrates on current valuation rather than future predictions
+# This comes with own set of disadvantage like it fails to consider company's management performance 
+# with book value of service based company is considerably low like Baking and IT
+# TIP: One can look for ROIC(Return on Invested Capital) for evaluating managements performance
 def graham_no(script_code):
     data = graham_data(script_code)
     book_value = data['book_value']
-    eps =  data['eps']
+    eps =  data['eps'] 
     no = sqrt(15 * 1.5 * float(book_value) * float(eps))
     no = round(no, 2)
     return no   
@@ -21,17 +27,19 @@ def adjusted_graham_no(script_code):
     no = round(no, 2)
     return no
 
-# Kelly Formula
+# Kelly Criterion Formula 
+# By calculating edge and odds, it states how much % of one's bankroll investor should bet.  
+# By comparing different investment options one can come up with optimal portfolio.
 def kelly_bet():
     outcomes = int(input("Enter the total no of possible outcomes of your investment: "))
     prob, returns, value = list(), list(), list()
     # Calculating Edge
     print("probablities should all sum up to 100")
     for i in range(outcomes):
-        a = float(input("Enter the probablity of event: "))
+        a = float(input("Enter the probablity of ", i+1, "event: "))
         a = a/100
         prob.append(a)
-        b = float(input("Enter the returns you get on event: "))
+        b = float(input("Enter the returns you get on ", i+1, "event: "))
         returns.append(b)
 
     # data = dict(zip(prob, returns))
@@ -39,17 +47,30 @@ def kelly_bet():
     for i in range(outcomes):
         c = (prob[i] * returns[i])
         value.append(c)
+    # Edge- Advantage of bet
     edge = round(sum(value),2)
-    print(edge)
-    # Odds - The max. you can make on this bet
+    print("Here the edge you get is", edge)
+    # Odds - The max. you can make/win on this bet
     d = sorted(returns,reverse=True)
     odds = d[0]
-    # How much of your bankroll you shoult bet
+    # How much % of your bankroll you should bet
     bet = (edge/odds) * 100
     # print("You can bet", bet,"%")
-    return bet
+    return ("You should brt", bet,"% of your bankroll")
+
+# In a coin toss -> Head means you win 100 rs. and tails means you lose 100 rs.
+# Probablitty of getting heads is 50%. 
+# With no edge, and no odds with you this is bad scenario to bet on.
+
+# Now, With same scenario, consider you only lose 50 rs but you win 100 rs on coin toss.
+# Even though odds are same but you have edge of 50 rs 
+# Hence kelly criterion formula will suggest you to bet 25% of your bankroll
+
+# and with scenario where you win 100 rs but you only lose 25 rs
+# kelly criterion will raise the % of bankroll you should bet to 37%
 
 
+# Now DCF 
 def dcf(script_code):
     data = dcf_data(script_code)
     year = data[1]
@@ -131,7 +152,6 @@ def dcf(script_code):
     intrinsic_value = round(((value)/(1+dr)**dcf_year), 2)
 
     return intrinsic_value
-
 
 
 def calculate_dcf():
@@ -221,6 +241,3 @@ def calculate_dcf():
     sub = intrinsic_value * mos
     best_buy = intrinsic_value - sub
     print("Best buy with ", mos*100, "% " "is ", best_buy)
-
-print(graham_no(509243))
-print(dcf(509243))
